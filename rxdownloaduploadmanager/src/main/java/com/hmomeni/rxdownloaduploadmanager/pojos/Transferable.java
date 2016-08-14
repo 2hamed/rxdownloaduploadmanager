@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
 
+import com.hmomeni.rxdownloaduploadmanager.interfaces.TransferableCallback;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -39,11 +41,15 @@ public class Transferable implements Parcelable {
 
 	String hash;
 	int progress = 0;
+	int priority = 0;
 
-	public Transferable(String remoteUrl, String localPath, int direction) {
+	TransferableCallback callback;
+
+	public Transferable(String remoteUrl, String localPath, int direction, int priority) {
 		this.remoteUrl = remoteUrl;
 		this.localPath = localPath;
 		this.direction = direction;
+		this.priority = priority;
 	}
 
 	public String getRemoteUrl() {
@@ -92,6 +98,22 @@ public class Transferable implements Parcelable {
 
 	public void setProgress(int progress) {
 		this.progress = progress;
+	}
+
+	public TransferableCallback getCallback() {
+		return callback;
+	}
+
+	public void setCallback(TransferableCallback callback) {
+		this.callback = callback;
+	}
+
+	public int getPriority() {
+		return priority;
+	}
+
+	public void setPriority(int priority) {
+		this.priority = priority;
 	}
 
 	@Override
