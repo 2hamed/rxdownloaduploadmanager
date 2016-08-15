@@ -39,7 +39,7 @@ public class RxDownloadManager {
 	}
 
 	public static void setAutoStart(boolean autoStart) {
-		autoStart = autoStart;
+		RxDownloadManager.autoStart = autoStart;
 	}
 
 	public static Map<String, Transferable> getMap() {
