@@ -1,6 +1,7 @@
 package com.hmomeni.rxdownloaduploadmanager;
 
 import android.Manifest;
+import android.os.Handler;
 import android.support.annotation.RequiresPermission;
 import android.support.v4.util.ArrayMap;
 
@@ -33,9 +34,11 @@ public class RxDownloadManager {
 	List<Transferable> list = new ArrayList<>();
 	private boolean isDownloading = false;
 	private static boolean autoStart = false;
+	private Handler handler;
 
 	public RxDownloadManager() {
 		okHttpClient = new OkHttpClient.Builder().build();
+		handler = new Handler();
 	}
 
 	public static void setAutoStart(boolean autoStart) {
@@ -125,7 +128,7 @@ public class RxDownloadManager {
 							inputStream = response.body().byteStream();
 							byte[] buff = new byte[1024 * 4];
 							long downloaded = 0;
-							long target = response.body().contentLength();
+							final long target = response.body().contentLength();
 							currentItem.getCallback().onProgress(currentItem, 0);
 							while (true) {
 								int readed = inputStream.read(buff);
@@ -135,7 +138,13 @@ public class RxDownloadManager {
 								//write buff
 								downloaded += readed;
 								outputStream.write(buff, 0, readed);
-								currentItem.getCallback().onProgress(currentItem, (int) ((float) downloaded / target * 100F));
+								final long finalDownloaded = downloaded;
+								handler.post(new Runnable() {
+									@Override
+									public void run() {
+										currentItem.getCallback().onProgress(currentItem, (int) ((float) finalDownloaded / target * 100F));
+									}
+								});
 							}
 							success = true;
 						} catch (IOException e) {
@@ -151,11 +160,18 @@ public class RxDownloadManager {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				if (success) {
-					currentItem.getCallback().onFinish(currentItem);
-				} else {
-					currentItem.getCallback().onFail(currentItem);
-				}
+				final boolean finalSuccess = success;
+				handler.post(new Runnable() {
+					@Override
+					public void run() {
+						if (finalSuccess) {
+							currentItem.getCallback().onFinish(currentItem);
+						} else {
+							currentItem.getCallback().onFail(currentItem);
+						}
+					}
+				});
+
 				map.remove(currentItem.getHash());
 				list.remove(currentItem);
 				isDownloading = false;
