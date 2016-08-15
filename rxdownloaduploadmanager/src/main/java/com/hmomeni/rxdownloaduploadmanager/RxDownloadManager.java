@@ -1,5 +1,7 @@
 package com.hmomeni.rxdownloaduploadmanager;
 
+import android.Manifest;
+import android.support.annotation.RequiresPermission;
 import android.support.v4.util.ArrayMap;
 
 import com.hmomeni.rxdownloaduploadmanager.pojos.Transferable;
@@ -30,11 +32,50 @@ public class RxDownloadManager {
 	Map<String, Transferable> map = new ArrayMap<>();
 	List<Transferable> list = new ArrayList<>();
 	private boolean isDownloading = false;
+	private static boolean autoStart = false;
 
 	public RxDownloadManager() {
 		okHttpClient = new OkHttpClient.Builder().build();
 	}
 
+	public static void setAutoStart(boolean autoStart) {
+		autoStart = autoStart;
+	}
+
+	public static Map<String, Transferable> getMap() {
+		if (instance == null) {
+			return null;
+		}
+		return instance.map;
+	}
+
+	@RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+	public static void addToQueue(List<Transferable> items) {
+		if (instance == null) {
+			instance = new RxDownloadManager();
+		}
+		for (Transferable transferable :
+				items) {
+			instance.map.put(transferable.getHash(), transferable);
+			instance.list.add(transferable);
+		}
+
+
+		Collections.sort(instance.list, new Comparator<Transferable>() {
+			@Override
+			public int compare(Transferable t1, Transferable t2) {
+				if (t1.getPriority() >= t2.getPriority()) {
+					return 1;
+				}
+				return 0;
+			}
+		});
+		if (autoStart) {
+			instance.processQueue();
+		}
+	}
+
+	@RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 	public static void addToQueue(Transferable transferable) {
 		if (instance == null) {
 			instance = new RxDownloadManager();
@@ -51,7 +92,9 @@ public class RxDownloadManager {
 				return 0;
 			}
 		});
-		instance.processQueue();
+		if (autoStart) {
+			instance.processQueue();
+		}
 	}
 
 	private void processQueue() {

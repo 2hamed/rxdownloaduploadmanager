@@ -5,9 +5,11 @@ import android.os.Parcelable;
 import android.support.annotation.IntDef;
 
 import com.hmomeni.rxdownloaduploadmanager.interfaces.TransferableCallback;
+import com.hmomeni.rxdownloaduploadmanager.util.Util;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Locale;
 
 /**
  * Created by hamed on 8/14/16.in MyDownloadManager
@@ -35,9 +37,9 @@ public class Transferable implements Parcelable {
 	String remoteUrl;
 	String localPath;
 	@Status
-	int status;
+	int status = STATUS_NOT_STARTED;
 	@Direction
-	int direction;
+	int direction = DIR_DOWNLOAD;
 
 	String hash;
 	int progress = 0;
@@ -45,11 +47,21 @@ public class Transferable implements Parcelable {
 
 	TransferableCallback callback;
 
-	public Transferable(String remoteUrl, String localPath, int direction, int priority) {
+	public Transferable(String remoteUrl,
+	                    String localPath,
+	                    int direction,
+	                    int priority,
+	                    TransferableCallback callback) {
 		this.remoteUrl = remoteUrl;
 		this.localPath = localPath;
 		this.direction = direction;
 		this.priority = priority;
+		this.callback = callback;
+		createHash();
+	}
+
+	private void createHash() {
+		hash = Util.md5(String.format(Locale.ENGLISH, "%s%s%d", remoteUrl, localPath, direction));
 	}
 
 	public String getRemoteUrl() {
@@ -58,6 +70,7 @@ public class Transferable implements Parcelable {
 
 	public void setRemoteUrl(String remoteUrl) {
 		this.remoteUrl = remoteUrl;
+		createHash();
 	}
 
 	public String getLocalPath() {
@@ -66,6 +79,7 @@ public class Transferable implements Parcelable {
 
 	public void setLocalPath(String localPath) {
 		this.localPath = localPath;
+		createHash();
 	}
 
 	public int getStatus() {
@@ -82,6 +96,7 @@ public class Transferable implements Parcelable {
 
 	public void setDirection(int direction) {
 		this.direction = direction;
+		createHash();
 	}
 
 	public String getHash() {
