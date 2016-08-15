@@ -18,30 +18,6 @@ android {
 	}
 }
 
-ext {
-	bintrayRepo = 'maven'
-	bintrayName = 'rxdownloaduploadmanager'
-
-	publishedGroupId = 'com.hmomeni'
-	libraryName = 'RxDownloadUploadManager'
-	artifact = 'rxdownloaduploadmanager'
-
-	libraryDescription = 'A simple manager for you downloads and uploads'
-
-	siteUrl = 'https://github.com/2hamed/rxdownloaduploadmanager'
-	gitUrl = 'https://github.com/2hamed/rxdownloaduploadmanager.git'
-
-	libraryVersion = '0.9.3'
-
-	developerId = '2hamed'
-	developerName = 'Hamed Momeni'
-	developerEmail = 'me@hmomeni.com'
-
-	licenseName = 'GPLv3'
-	licenseUrl = 'https://www.gnu.org/licenses/gpl-3.0.en.html'
-	allLicenses = ["GPLv3"]
-}
-
 dependencies {
 	compile fileTree(dir: 'libs', include: ['*.jar'])
 	testCompile 'junit:junit:4.12'
