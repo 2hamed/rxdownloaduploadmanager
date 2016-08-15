@@ -5,7 +5,7 @@ import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.hmomeni.rxdownloaduploadmanager.RxDownloadManager;
+import com.hmomeni.rxdownloaduploadmanager.RxUploadManager;
 import com.hmomeni.rxdownloaduploadmanager.interfaces.TransferableCallback;
 import com.hmomeni.rxdownloaduploadmanager.pojos.Transferable;
 
@@ -44,9 +44,9 @@ public class MainActivity extends AppCompatActivity implements TransferableCallb
 				Environment.getExternalStorageDirectory().getAbsolutePath() + "/master4.zip",
 				Transferable.DIR_DOWNLOAD, 5, this
 		));
-		RxDownloadManager.setAutoStart(true);
-		RxDownloadManager.addToQueue(items);
-		map = RxDownloadManager.getMap();
+		RxUploadManager.setAutoStart(true);
+		RxUploadManager.addToQueue(items);
+		map = RxUploadManager.getMap();
 	}
 
 	@Override
@@ -56,11 +56,11 @@ public class MainActivity extends AppCompatActivity implements TransferableCallb
 
 	@Override
 	public void onFinish(Transferable transferable) {
-		Log.d(TAG, "onFinish: " + transferable.getRemoteUrl());
+		Log.d(TAG, "onFinish: " + transferable.getRemoteUrl() + " response: " + transferable.getServerResponse());
 	}
 
 	@Override
 	public void onFail(Transferable transferable) {
-		Log.d(TAG, "onFail: " + transferable.getRemoteUrl());
+		Log.d(TAG, "onFail: " + transferable.getRemoteUrl() + " response: " + transferable.getServerResponse());
 	}
 }

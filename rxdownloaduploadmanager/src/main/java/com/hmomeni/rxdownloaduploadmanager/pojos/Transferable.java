@@ -47,6 +47,8 @@ public class Transferable implements Parcelable {
 
 	TransferableCallback callback;
 
+	String serverResponse;
+
 	public Transferable(String remoteUrl,
 	                    String localPath,
 	                    int direction,
@@ -129,6 +131,14 @@ public class Transferable implements Parcelable {
 
 	public void setPriority(int priority) {
 		this.priority = priority;
+	}
+
+	public String getServerResponse() {
+		return serverResponse;
+	}
+
+	public void setServerResponse(String serverResponse) {
+		this.serverResponse = serverResponse;
 	}
 
 	@Override
