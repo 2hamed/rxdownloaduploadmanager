@@ -45,6 +45,12 @@ public class RxDownloadManager {
 		RxDownloadManager.autoStart = autoStart;
 	}
 
+	public static void start() {
+		if (instance != null) {
+			instance.processQueue();
+		}
+	}
+
 	public static Map<String, Transferable> getMap() {
 		if (instance == null) {
 			return null;
