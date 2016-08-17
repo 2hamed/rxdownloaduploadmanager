@@ -2,6 +2,7 @@ package com.hmomeni.rxdownloaduploadmanager;
 
 import android.Manifest;
 import android.os.Handler;
+import android.support.annotation.MainThread;
 import android.support.annotation.RequiresPermission;
 import android.support.v4.util.ArrayMap;
 
@@ -36,7 +37,8 @@ public class RxDownloadManager {
 	private static boolean autoStart = false;
 	private Handler handler;
 
-	public RxDownloadManager() {
+	@MainThread
+	private RxDownloadManager() {
 		okHttpClient = new OkHttpClient.Builder().build();
 		handler = new Handler();
 	}
