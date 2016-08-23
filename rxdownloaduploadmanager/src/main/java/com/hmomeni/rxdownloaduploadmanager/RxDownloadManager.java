@@ -30,9 +30,9 @@ public class RxDownloadManager {
 	private static RxDownloadManager instance;
 
 
-	OkHttpClient okHttpClient;
-	Map<String, Transferable> map = new ArrayMap<>();
-	List<Transferable> list = new ArrayList<>();
+	private OkHttpClient okHttpClient;
+	private Map<String, Transferable> map = new ArrayMap<>();
+	private List<Transferable> list = new ArrayList<>();
 	private boolean isDownloading = false;
 	private static boolean autoStart = false;
 	private Handler handler;

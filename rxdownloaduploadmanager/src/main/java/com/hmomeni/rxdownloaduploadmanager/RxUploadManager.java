@@ -15,9 +15,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -32,14 +34,15 @@ public class RxUploadManager {
 	private static RxUploadManager instance;
 
 
-	OkHttpClient okHttpClient;
-	Map<String, Transferable> map = new ArrayMap<>();
-	List<Transferable> list = new ArrayList<>();
+	private OkHttpClient okHttpClient;
+	private Headers headers;
+	private Map<String, Transferable> map = new ArrayMap<>();
+	private List<Transferable> list = new ArrayList<>();
 	private boolean isUploading = false;
 	private static boolean autoStart = false;
 
-	public RxUploadManager() {
-		okHttpClient = new OkHttpClient.Builder().build();
+	private RxUploadManager() {
+		okHttpClient = new OkHttpClient.Builder().writeTimeout(360, TimeUnit.SECONDS).readTimeout(360, TimeUnit.SECONDS).build();
 	}
 
 	public static void setAutoStart(boolean autoStart) {
@@ -59,11 +62,16 @@ public class RxUploadManager {
 		return instance.map;
 	}
 
-	@RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-	public static void addToQueue(List<Transferable> items) {
+	private static RxUploadManager getInstance() {
 		if (instance == null) {
 			instance = new RxUploadManager();
 		}
+		return instance;
+	}
+
+	@RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+	public static void addToQueue(List<Transferable> items) {
+		RxUploadManager instance = getInstance();
 		for (Transferable transferable :
 				items) {
 			instance.map.put(transferable.getHash(), transferable);
@@ -85,12 +93,14 @@ public class RxUploadManager {
 		}
 	}
 
+	public static void addHeaders(Headers headers) {
+		getInstance().headers = headers;
+	}
 
 	@RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 	public static void addToQueue(Transferable transferable) {
-		if (instance == null) {
-			instance = new RxUploadManager();
-		}
+		RxUploadManager instance = getInstance();
+
 		instance.map.put(transferable.getHash(), transferable);
 		instance.list.add(transferable);
 
@@ -129,16 +139,17 @@ public class RxUploadManager {
 					currentItem.getCallback().onProgress(currentItem, num);
 				}
 			});
-
-			Request request = new Request.Builder()
+			Request.Builder requestBuilder = new Request.Builder()
 					.tag(currentItem.getHash())
 					.url(currentItem.getRemoteUrl())
-					.post(countingFileRequestBody)
-					.build();
-
-			okHttpClient.newCall(request).enqueue(new Callback() {
+					.post(countingFileRequestBody);
+			if (headers != null) {
+				requestBuilder.headers(headers);
+			}
+			okHttpClient.newCall(requestBuilder.build()).enqueue(new Callback() {
 				@Override
 				public void onFailure(Call call, IOException e) {
+					e.printStackTrace();
 					handleFinished(currentItem, false);
 				}
 
