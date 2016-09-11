@@ -34,20 +34,24 @@ public class Transferable implements Parcelable {
 	public static final int DIR_UPLOAD = 1;
 
 
-	String remoteUrl;
-	String localPath;
+	private String remoteUrl;
+	private String localPath;
 	@Status
+	private
 	int status = STATUS_NOT_STARTED;
 	@Direction
+	private
 	int direction = DIR_DOWNLOAD;
 
-	String hash;
-	int progress = 0;
-	int priority = 0;
+	private String hash;
+	private int progress = 0;
+	private int priority = 0;
 
-	TransferableCallback callback;
+	private String paramName;
 
-	String serverResponse;
+	private TransferableCallback callback;
+
+	private String serverResponse;
 
 	public Transferable(String remoteUrl,
 	                    String localPath,
@@ -60,6 +64,27 @@ public class Transferable implements Parcelable {
 		this.priority = priority;
 		this.callback = callback;
 		createHash();
+	}
+
+	public Transferable(String remoteUrl,
+	                    String localPath,
+	                    int status,
+	                    int direction,
+	                    String hash,
+	                    int progress,
+	                    int priority,
+	                    String paramName,
+	                    TransferableCallback callback, String serverResponse) {
+		this.remoteUrl = remoteUrl;
+		this.localPath = localPath;
+		this.status = status;
+		this.direction = direction;
+		this.hash = hash;
+		this.progress = progress;
+		this.priority = priority;
+		this.paramName = paramName;
+		this.callback = callback;
+		this.serverResponse = serverResponse;
 	}
 
 	private void createHash() {
@@ -82,6 +107,14 @@ public class Transferable implements Parcelable {
 	public void setLocalPath(String localPath) {
 		this.localPath = localPath;
 		createHash();
+	}
+
+	public String getParamName() {
+		return paramName;
+	}
+
+	public void setParamName(String paramName) {
+		this.paramName = paramName;
 	}
 
 	public int getStatus() {

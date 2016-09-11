@@ -20,7 +20,6 @@ public class CountingFileRequestBody extends RequestBody {
 	private final ProgressListener listener;
 	private final String key;
 	private final MultipartBody multipartBody;
-	protected CountingSink mCountingSink;
 
 	public CountingFileRequestBody(MultipartBody multipartBody,
 	                               String key,
@@ -42,7 +41,7 @@ public class CountingFileRequestBody extends RequestBody {
 
 	@Override
 	public void writeTo(BufferedSink sink) throws IOException {
-		mCountingSink = new CountingSink(sink);
+		CountingSink mCountingSink = new CountingSink(sink);
 		BufferedSink bufferedSink = Okio.buffer(mCountingSink);
 		multipartBody.writeTo(bufferedSink);
 		bufferedSink.flush();
@@ -52,19 +51,18 @@ public class CountingFileRequestBody extends RequestBody {
 		void transferred(String key, int num);
 	}
 
-	protected final class CountingSink extends ForwardingSink {
+	private final class CountingSink extends ForwardingSink {
 		private long bytesWritten = 0;
 
-		public CountingSink(Sink delegate) {
+		CountingSink(Sink delegate) {
 			super(delegate);
 		}
 
 		@Override
 		public void write(Buffer source, long byteCount) throws IOException {
+			super.write(source, byteCount);
 			bytesWritten += byteCount;
 			listener.transferred(key, (int) (100F * bytesWritten / contentLength()));
-			super.write(source, byteCount);
-			delegate().flush();
 		}
 	}
 

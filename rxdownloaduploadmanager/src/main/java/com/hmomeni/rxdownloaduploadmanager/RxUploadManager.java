@@ -131,8 +131,8 @@ public class RxUploadManager {
 		currentItem = list.get(0);
 		File file = new File(currentItem.getLocalPath());
 		if (file.exists()) {
-
-			MultipartBody multipartBody = new MultipartBody.Builder().setType(MultipartBody.FORM).addFormDataPart("media", file.getName(), RequestBody.create(MediaType.parse(MimeTypeMap.getSingleton().getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(file.getAbsolutePath()))), file)).build();
+			String paramName = currentItem.getParamName() == null ? "media" : currentItem.getParamName();
+			MultipartBody multipartBody = new MultipartBody.Builder().setType(MultipartBody.FORM).addFormDataPart(paramName, file.getName(), RequestBody.create(MediaType.parse(MimeTypeMap.getSingleton().getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(file.getAbsolutePath()))), file)).build();
 			CountingFileRequestBody countingFileRequestBody = new CountingFileRequestBody(multipartBody, currentItem.getHash(), new CountingFileRequestBody.ProgressListener() {
 				@Override
 				public void transferred(String key, int num) {
