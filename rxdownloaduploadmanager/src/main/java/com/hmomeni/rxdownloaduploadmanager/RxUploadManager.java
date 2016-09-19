@@ -74,6 +74,9 @@ public class RxUploadManager {
 		RxUploadManager instance = getInstance();
 		for (Transferable transferable :
 				items) {
+			if (instance.map.containsKey(transferable.getHash())) {
+				break;
+			}
 			instance.map.put(transferable.getHash(), transferable);
 			instance.list.add(transferable);
 		}
@@ -100,7 +103,9 @@ public class RxUploadManager {
 	@RequiresPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 	public static void addToQueue(Transferable transferable) {
 		RxUploadManager instance = getInstance();
-
+		if (instance.map.containsKey(transferable.getHash())) {
+			return;
+		}
 		instance.map.put(transferable.getHash(), transferable);
 		instance.list.add(transferable);
 
